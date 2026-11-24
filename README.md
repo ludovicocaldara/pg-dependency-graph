@@ -99,6 +99,37 @@ The views calculate relationships from the current inventory; no separate snapsh
 
 The fresh `load-oracle.sh` creates these graphs. For an existing installation, run `projected-graphs.sql` as `PG_DEPS`; the `CREATE OR REPLACE` definitions preserve the base data. These views require Oracle AI Database 26ai release update 23.26.1 or later.
 
+
+### Grouped RPM graph
+
+`PG_RPM_GROUPED` uses `pgdep_rpm_grouped_edge` to show one edge per source and destination RPM pair. Each edge records the number and list of distinct requirement capabilities. `schema.sql` creates the table and graph; `grouped-rpm-graph.sql` populates the grouped edges after the inventory and projected views are loaded; `refresh-oracle.sh` rebuilds its rows in the same transaction as the base inventory. The physical table is used because Graph Explorer returned vertices but omitted edges for the aggregated view in this environment. The capability list can be truncated when it exceeds the `LISTAGG` limit; `capability_count` still reports the complete distinct count.
+
+To visualize dependencies up to three levels from `postgresql18-server` using the grouped graph:
+
+```sql
+SELECT *
+FROM GRAPH_TABLE (
+  pg_deps.pg_rpm_grouped
+  MATCH (root IS dependency_node)
+        -[IS rpm_requires]->{1,3}
+        (finish IS dependency_node)
+  WHERE root.kind = 'RPM'
+    AND root.name = 'postgresql18-server'
+  ONE ROW PER STEP (source, dependency, destination)
+  COLUMNS (
+    vertex_id(source) AS source_id,
+    edge_id(dependency) AS edge_id,
+    vertex_id(destination) AS dest_id,
+    source.name AS source_rpm,
+    destination.name AS required_rpm,
+    dependency.capability_count AS capability_count,
+    dependency.capabilities AS capabilities
+  )
+);
+```
+
+Change `{1,3}` to adjust traversal depth. This query returns one row per step in each matched path, so a shared edge may appear in multiple rows. A depth bound can omit deeper dependencies; cycles and shared dependencies mean the result is a network rather than necessarily a tree. The visualization may display results in batches.
+
 ## License
 
 Project-authored material is licensed under the [Universal Permissive License, Version 1.0](LICENSE) (UPL-1.0). Downloaded Oracle software and third-party PostgreSQL packages are subject to their respective licenses and terms.

@@ -14,6 +14,7 @@ docker cp schema.sql "$name":/tmp/pg-deps-schema.sql
 docker cp inventory-crb.sql "$name":/tmp/pg-deps-inventory.sql
 docker cp graph-queries.sql "$name":/tmp/pg-deps-queries.sql
 docker cp projected-graphs.sql "$name":/tmp/pg-deps-projected-graphs.sql
+docker cp grouped-rpm-graph.sql "$name":/tmp/pg-deps-grouped-rpm-graph.sql
 # This setup is intentionally fresh-only: CREATE USER fails if the user exists.
 printf 'SET VERIFY OFF ECHO OFF FEEDBACK OFF\nWHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK\n@/tmp/pg-deps-create-user.sql %s\n' "$password" | docker exec -i "$name" sqlplus -s / as sysdba
-printf 'SET VERIFY OFF ECHO OFF FEEDBACK OFF\nWHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK\nCONNECT pg_deps/"%s"@//localhost:1521/FREEPDB1\n@/tmp/pg-deps-schema.sql\n@/tmp/pg-deps-inventory.sql\n@/tmp/pg-deps-projected-graphs.sql\n@/tmp/pg-deps-queries.sql\n' "$password" | docker exec -i "$name" sqlplus -s /nolog
+printf 'SET VERIFY OFF ECHO OFF FEEDBACK OFF\nWHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK\nCONNECT pg_deps/"%s"@//localhost:1521/FREEPDB1\n@/tmp/pg-deps-schema.sql\n@/tmp/pg-deps-inventory.sql\n@/tmp/pg-deps-projected-graphs.sql\n@/tmp/pg-deps-grouped-rpm-graph.sql\n@/tmp/pg-deps-queries.sql\n' "$password" | docker exec -i "$name" sqlplus -s /nolog
