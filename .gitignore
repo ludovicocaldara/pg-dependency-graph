@@ -1,0 +1,8 @@
+
+.oracle-password
+
+.pg-deps-password
+
+# Downloaded Oracle Graph Server and Client packages
+/graph-explorer/oracle-graph*.rpm
+/graph-explorer/oracle-graph*.zip

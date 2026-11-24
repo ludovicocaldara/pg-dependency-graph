@@ -1,0 +1,7 @@
+FROM localhost/pg-deps-graph-explorer:latest
+USER root
+RUN cp /etc/pki/java/cacerts /etc/oracle/graph/client-truststore.jks && \
+    keytool -exportcert -alias pgx -keystore /etc/oracle/graph/server_keystore.jks -storepass changeit -rfc | keytool -importcert -noprompt -alias pgx-local -keystore /etc/oracle/graph/client-truststore.jks -storepass changeit && \
+    chmod 644 /etc/oracle/graph/client-truststore.jks
+COPY start-graph.sh /usr/local/bin/start-graph
+USER graphapp
