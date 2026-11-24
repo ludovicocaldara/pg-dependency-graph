@@ -8,7 +8,7 @@ docker run --rm pg-deps /usr/local/bin/export-graph > inventory.sql
 docker run --rm pg-deps cat /var/lib/pg-deps/failed.txt
 ```
 
-In a fresh Oracle Database 23ai or later schema, run `schema.sql`, then `inventory-crb.sql` with SQLcl or SQL*Plus. The schema uses SQL property graphs. The inventory is a snapshot; create a fresh schema or clear edges followed by vertices before loading another snapshot. The schema script creates objects and is not idempotent.
+In a fresh Oracle AI Database 26ai or later schema, run `schema.sql`, then `inventory-crb.sql` with SQLcl or SQL*Plus. The schema uses SQL property graphs. The inventory is a snapshot; create a fresh schema or clear edges followed by vertices before loading another snapshot. The schema script creates objects and is not idempotent.
 
 Vertices represent RPMs, exact RPM requirement strings, and extension control files. Edges represent requirements, installed providers, packaging ownership, and extension control-file `requires` entries. A capability can have multiple installed providers; this shows potential providers, not the exact resolver decision. RPM requirements include version expressions and system dependencies. Extension dependencies are declared prerequisites, not runtime dependency analysis or compatibility certification. Missing extension prerequisites remain vertices without a package edge. Core contrib extensions are included when their control files are installed. Not all packages are PostgreSQL extensions or enabled in a database.
 
