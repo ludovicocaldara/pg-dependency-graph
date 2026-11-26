@@ -14,6 +14,10 @@ Vertices represent RPMs, exact RPM requirement strings, and extension control fi
 
 Review `/var/lib/pg-deps/candidates.txt`, `failed.txt` and `install.log` for coverage and failures. Install availability changes over time and by platform; pin base image and repositories for reproducibility. Building can take substantial time and disk space. RPM metadata and extension control files are untrusted inputs: review generated SQL before loading it into Oracle.
 
+## ELF library dependency graph
+
+For dependencies resolved from `postgres`, `psql`, and the shared objects in the PostgreSQL library directory, see [elf-dependencies/README.md](elf-dependencies/README.md). This separate workflow uses ELF and loader information instead of RPM metadata and loads its own Oracle schema and property graph.
+
 ## Installation report
 
 See [installation-report.md](installation-report.md) for the packages that succeeded or failed, failure causes, and the extensions present in the built image. The full build record is in [installation.log](installation.log). The current image snapshot, [inventory-crb.sql](inventory-crb.sql), is loaded in Oracle. The earlier [inventory.sql](inventory.sql) is retained as a previous snapshot. Run `./refresh-oracle.sh` to replace the existing graph data with the CRB snapshot; it deletes the existing edge and vertex rows and loads the snapshot in one transaction.
